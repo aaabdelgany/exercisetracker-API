@@ -37,7 +37,19 @@ app.get('/api/users/:id/logs', async (req, res) => {
   const userId = req.params.id;
   const user = await User.findById(userId);
   const username = user.username;
-  const log = await Exercise.find({ username: username });
+  let log = await Exercise.find({ username: username });
+
+  if (req.query.limit) {
+    log = log.slice(0, req.query.limit);
+  }
+  if (req.query.from && req.query.to) {
+    log = log.filter(
+      (ex) =>
+        new Date(ex.date).toISOString().slice(0, 10) >= req.query.from &&
+        new Date(ex.date).toISOString().slice(0, 10) <= req.query.to
+    );
+    // log = log.filter(ex=>ex.date)
+  }
   res.json({ _id: userId, username, count: log.length, log });
 });
 app.post('/api/users', (req, res) => {
@@ -60,7 +72,7 @@ app.post('/api/users/:id/exercises', async (req, res) => {
     date,
   });
   exercise.save();
-  res.json({ ...exercise, _id: userId });
+  res.json({ username, description, duration, date, _id: userId });
 });
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);
