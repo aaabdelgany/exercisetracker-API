@@ -21,8 +21,8 @@ mongoose
     console.error(`error connecting to mongodb ${error.message}`);
   });
 app.use(cors());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 // app.use(morgan('tiny'));
 app.get('/', (req, res) => {
@@ -64,7 +64,9 @@ app.post('/api/users/:id/exercises', async (req, res) => {
   const username = user.username;
   const description = req.body.description;
   const duration = Number(req.body.duration);
-  const date = req.body.date || new Date().toISOString().slice(0, 10);
+  const date =
+    new Date(req.body.date).toDateString() ||
+    new Date().toISOString().slice(0, 10);
 
   const exercise = new Exercise({
     username,
