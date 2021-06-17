@@ -64,7 +64,7 @@ app.post('/api/users/:id/exercises', async (req, res) => {
   const username = user.username;
   const description = req.body.description;
   const duration = req.body.duration;
-  const date = req.body.date || new Date().toISOString();
+  const date = req.body.date || new Date().toISOString().slice(0, 10);
 
   const exercise = new Exercise({
     username,
