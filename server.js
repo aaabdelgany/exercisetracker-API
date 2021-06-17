@@ -24,7 +24,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
-app.use(morgan('tiny'));
+// app.use(morgan('tiny'));
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
@@ -58,6 +58,7 @@ app.post('/api/users', (req, res) => {
   res.json(user);
 });
 app.post('/api/users/:id/exercises', async (req, res) => {
+  console.log(req.params);
   const userId = req.params.id;
   const user = await User.findById(userId);
   const username = user.username;
