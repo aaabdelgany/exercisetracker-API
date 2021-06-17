@@ -11,6 +11,7 @@ const Exercise = new Schema({
 Exercise.set('toJSON', {
   transform: (document, returnedObject) => {
     delete returnedObject.__v;
+    delete returnedObject.__id;
   },
 });
 

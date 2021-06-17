@@ -35,9 +35,9 @@ app.get('/api/users', async (req, res) => {
 });
 app.get('/api/users/:id/logs', async (req, res) => {
   const userId = req.params.id;
-  const user = await User.find({ _id: userId });
+  const user = await User.findById(userId);
   const username = user.username;
-  const log = await Exercise.find({ _id: userId });
+  const log = await Exercise.find({ username: username });
   res.json({ _id: userId, username, count: log.length, log });
 });
 app.post('/api/users', (req, res) => {
@@ -54,14 +54,13 @@ app.post('/api/users/:id/exercises', async (req, res) => {
   const date = req.body.date || new Date().toDateString();
 
   const exercise = new Exercise({
-    _id: userId,
     username,
     description,
     duration,
     date,
   });
   exercise.save();
-  res.json(exercise);
+  res.json({ ...exercise, _id: userId });
 });
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);
