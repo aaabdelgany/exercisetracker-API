@@ -58,7 +58,7 @@ app.post('/api/users', (req, res) => {
   res.json(user);
 });
 app.post('/api/users/:id/exercises', async (req, res) => {
-  console.log(req.params);
+  console.log(req.body);
   const userId = req.params.id;
   const user = await User.findById(userId);
   const username = user.username;
