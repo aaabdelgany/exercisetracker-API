@@ -47,7 +47,7 @@ app.post('/api/users', (req, res) => {
 });
 app.post('/api/users/:id/exercises', async (req, res) => {
   const userId = req.params.id;
-  const user = await User.findOne({ _id: userId });
+  const user = await User.findById(userId);
   const username = user.username;
   const description = req.body.description;
   const duration = req.body.duration;
