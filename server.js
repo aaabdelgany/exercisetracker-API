@@ -1,18 +1,68 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
-require('dotenv').config()
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const mongoose = require('mongoose');
+const morgan = require('morgan');
+const User = require('./models/User');
+const Exercise = require('./models/Exercise');
 
-app.use(cors())
-app.use(express.static('public'))
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  })
+  .then(() => {
+    console.log('Connected to MongoDB!');
+  })
+  .catch((error) => {
+    console.error(`error connecting to mongodb ${error.message}`);
+  });
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static('public'));
+app.use(morgan('tiny'));
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html')
+  res.sendFile(__dirname + '/views/index.html');
 });
 
+app.get('/api/users', async (req, res) => {
+  const users = await User.find({});
+  res.json(users);
+});
+app.get('/api/users/:id/logs', async (req, res) => {
+  const userId = req.params.id;
+  const user = await User.find({ _id: userId });
+  const username = user.username;
+  const log = await Exercise.find({ _id: userId });
+  res.json({ _id: userId, username, count: log.length, log });
+});
+app.post('/api/users', (req, res) => {
+  const user = new User({ username: req.body.username });
+  user.save();
+  res.json(user);
+});
+app.post('/api/users/:id/exercises', async (req, res) => {
+  const userId = req.params.id;
+  const user = await User.findOne({ _id: userId });
+  const username = user.username;
+  const description = req.body.description;
+  const duration = req.body.duration;
+  const date = req.body.date || new Date().toISOString().slice(0, 10);
 
-
-
-
+  const exercise = new Exercise({
+    _id: userId,
+    username,
+    description,
+    duration,
+    date,
+  });
+  exercise.save();
+  res.json(exercise);
+});
 const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
-})
+  console.log('Your app is listening on port ' + listener.address().port);
+});
